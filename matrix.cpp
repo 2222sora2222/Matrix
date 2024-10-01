@@ -2,16 +2,17 @@
 #include <vector>
 #include <map>
 #include <iomanip>
+#include <cstdlib> // Для функции std::abs
 
 // Класс для хранения полной матрицы
-class Matrix {
+class MatrixDiagonal {
 private:
     std::vector<std::vector<int>> data; // Двумерный массив для хранения элементов матрицы
     size_t rows, cols;                  // Количество строк и столбцов
 
 public:
     // Конструктор по умолчанию
-    Matrix(size_t r, size_t c) : rows(r), cols(c) {
+    MatrixDiagonal(size_t r, size_t c) : rows(r), cols(c) {
         data.resize(r, std::vector<int>(c, 0)); // Инициализация нулями
     }
 
@@ -41,12 +42,12 @@ public:
     }
 
     // Метод для получения количества строк
-    size_t GetRows() const {
+    size_t GetRowsNum() const {
         return rows;
     }
 
     // Метод для получения количества столбцов
-    size_t GetCols() const {
+    size_t GetColsNum() const {
         return cols;
     }
 };
@@ -63,8 +64,10 @@ public:
 
     // Метод для задания значения элемента (только для диагоналей)
     void SetDiagonalValue(int diagonal, size_t index, int value) {
+        // Преобразуем отрицательный индекс диагонали в беззнаковый тип size_t
+        size_t diagonal_abs = static_cast<size_t>(std::abs(diagonal));
         if (diagonal >= -static_cast<int>(rows) + 1 && diagonal <= static_cast<int>(cols) - 1) {
-            diagonals[diagonal].resize(std::min(rows, cols) - abs(diagonal), 0);
+            diagonals[diagonal].resize(std::min(rows, cols) - diagonal_abs, 0);
             diagonals[diagonal][index] = value;
         }
     }
@@ -90,9 +93,9 @@ public:
     }
 
     // Метод для преобразования полной матрицы в экономный формат
-    void FromMatrix(const Matrix &matrix) {
-        rows = matrix.GetRows();
-        cols = matrix.GetCols();
+    void FromMatrix(const MatrixDiagonal &matrix) {
+        rows = matrix.GetRowsNum();
+        cols = matrix.GetColsNum();
         diagonals.clear();
         for (size_t i = 0; i < rows; ++i) {
             for (size_t j = 0; j < cols; ++j) {
@@ -106,12 +109,12 @@ public:
     }
 
     // Метод для получения количества строк
-    size_t GetRows() const {
+    size_t GetRowsNum() const {
         return rows;
     }
 
     // Метод для получения количества столбцов
-    size_t GetCols() const {
+    size_t GetColsNum() const {
         return cols;
     }
 };
@@ -119,7 +122,7 @@ public:
 // Функция для тестирования работы классов
 int main() {
     // Создание полной матрицы и инициализация
-    Matrix fullMatrix(5, 5);
+    MatrixDiagonal fullMatrix(5, 5);
     fullMatrix.SetValue(0, 0, 1);
     fullMatrix.SetValue(1, 1, 2);
     fullMatrix.SetValue(2, 2, 3);
