@@ -107,6 +107,47 @@ public:
         }
         outFile.close();
     }
+      // Метод загрузки матрицы из файла
+    void LoadFromFile(const std::string &filename) {
+        std::ifstream inFile(filename);
+        if (!inFile) {
+            throw std::runtime_error("Не удалось открыть файл для чтения.");
+        }
+
+        size_t newRows, newCols;
+        inFile >> newRows >> newCols;
+
+        if (newRows == 0 || newCols == 0) {
+            throw std::runtime_error("Некорректные размеры матрицы в файле.");
+        }
+
+        rows = newRows;
+        cols = newCols;
+        data.resize(rows, std::vector<T>(cols));
+
+        for (size_t i = 0; i < rows; ++i) {
+            for (size_t j = 0; j < cols; ++j) {
+                inFile >> data[i][j];
+            }
+        }
+
+        if (inFile.fail()) {
+            throw std::runtime_error("Ошибка чтения данных из файла.");
+        }
+
+        inFile.close();
+    }
+    
+ // Вывод матрицы на экран
+    void Print() const {
+        for (size_t i = 0; i < rows; ++i) {
+            for (size_t j = 0; j < cols; ++j) {
+                std::cout << std::setw(4) << data[i][j] << " ";
+            }
+            std::cout << std::endl;
+        }
+    }
+    
 };
 
 // Фабрика для создания матриц
@@ -211,9 +252,24 @@ int main() {
 
         PerformAndSaveOperation(*matrix1, *matrix2, operation, filename);
 
+MatrixDense<int> matrix(5, 5);
+    matrix.SetValue(0, 0, 1);
+    matrix.SetValue(0, 1, 2);
+    matrix.SetValue(0, 2, 3);
+    matrix.SetValue(1, 0, 4);
+    matrix.SetValue(1, 1, 5);
+    matrix.SetValue(1, 2, 6);
+    std::cout << "Загрузка матрицы из файла...\n";
+    matrix.LoadFromFile(filename);
+
+    std::cout << "Загруженная матрица:\n";
+    matrix.Print();
+        
     } catch (const std::exception &e) {
         std::cerr << "Ошибка: " << e.what() << std::endl;
     }
+
+
 
     return 0;
 }
